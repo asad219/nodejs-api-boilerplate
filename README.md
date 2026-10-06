@@ -10,6 +10,8 @@ REST API boilerplate for **MyApp**, built with Node.js 20, Express 4 and MongoDB
 - Email: Resend (disabled unless `EMAIL_ENABLED=true`)
 - Deployment: Docker and Docker Compose (see [DOCKER.md](DOCKER.md))
 
+Repository: [github.com/asad219/nodejs-api-boilerplate](https://github.com/asad219/nodejs-api-boilerplate)
+
 ## Creating a new project from this boilerplate
 
 ### 1. Copy the boilerplate
@@ -17,7 +19,7 @@ REST API boilerplate for **MyApp**, built with Node.js 20, Express 4 and MongoDB
 Clone it into a new folder and start a fresh git history:
 
 ```bash
-git clone <boilerplate-repo-url> my-new-api
+git clone --depth 1 https://github.com/asad219/nodejs-api-boilerplate.git my-new-api
 cd my-new-api
 rm -rf .git
 git init
@@ -26,7 +28,7 @@ git init
 Or copy a local checkout, skipping installed and generated files:
 
 ```bash
-rsync -a --exclude node_modules --exclude logs --exclude .env --exclude .git myapp-api/ my-new-api/
+rsync -a --exclude node_modules --exclude logs --exclude .env --exclude .git nodejs-api-boilerplate/ my-new-api/
 cd my-new-api
 git init
 ```
@@ -224,4 +226,3 @@ throw new Error('User not found');
 7. `npm run db:schema` to refresh `docs/db-schema.json`.
 
 Use the `Note` files (`noteModel.js`, `note.zod.js`, `noteController.js`, `noteRoutes.js`, `noteRoutes.swagger.js`) as the template.
-# nodejs-api-boilerplate
