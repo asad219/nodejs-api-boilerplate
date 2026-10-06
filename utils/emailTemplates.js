@@ -85,27 +85,6 @@ const buildRegistrationSuccessEmail = ({ firstName, otp }) => {
   return { subject, html, text };
 };
 
-const buildResendOtpEmail = ({ firstName, otp }) => {
-  const { companyName, appUrl } = getBrand();
-  const safeName = escapeHtml(firstName || 'there');
-
-  const subject = `Your verification code - ${companyName}`;
-
-  const html = renderLayout({
-    heading: 'Verification Code',
-    body: `
-          ${paragraph(`Hi ${safeName},`)}
-          ${paragraph(`You requested a new verification code for your <strong>${escapeHtml(companyName)}</strong> account. Use the code below to complete verification.`)}
-          ${otpBlock(otp, 'Your one-time verification code is:')}
-          ${paragraph('If you did not request this code, please contact our support team immediately.', 'margin-bottom:24px;')}
-          ${ctaButton()}`,
-  });
-
-  const text = `Hi ${firstName || 'there'},\n\nYou requested a new verification code for your ${companyName} account.\n\nYour one-time verification code is: ${otp}\n\nDo not share this code with anyone. ${companyName} will never ask you for it.\n\nOpen app: ${appUrl}\n\nIf you did not request this code, please contact support.`;
-
-  return { subject, html, text };
-};
-
 const buildResetPasswordOtpEmail = ({ firstName, otp }) => {
   const { companyName, appUrl } = getBrand();
   const safeName = escapeHtml(firstName || 'there');
@@ -151,7 +130,6 @@ const buildContactUsEmail = ({ name, email, subject: userSubject, message }) => 
 
 module.exports = {
   buildRegistrationSuccessEmail,
-  buildResendOtpEmail,
   buildResetPasswordOtpEmail,
   buildContactUsEmail,
 };

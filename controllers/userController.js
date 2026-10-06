@@ -111,12 +111,8 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
-  const authHeader = req.headers.authorization || req.headers.Authorization;
-  const token = authHeader?.split(' ')[1];
-
-  if (token) {
-    await revokeToken(token);
-  }
+  // validateToken already verified the token and attached it to the request
+  await revokeToken(req.token);
 
   res.status(200).json({
     message: 'Logout successful',

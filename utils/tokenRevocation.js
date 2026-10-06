@@ -21,7 +21,6 @@ const isTokenRevoked = async (token) => {
 };
 
 module.exports = {
-  hashToken,
   revokeToken,
   isTokenRevoked,
 };

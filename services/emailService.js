@@ -3,7 +3,6 @@ const config = require('../config');
 const logger = require('../config/logger');
 const {
   buildRegistrationSuccessEmail,
-  buildResendOtpEmail,
   buildResetPasswordOtpEmail,
   buildContactUsEmail,
 } = require('../utils/emailTemplates');
@@ -49,16 +48,6 @@ const sendRegistrationSuccessEmail = async ({ to, firstName, otp }) => {
   await sendEmail({ to, subject, html, text });
 };
 
-const sendResendOtpEmail = async ({ to, firstName, otp }) => {
-  if (!canSendEmail()) {
-    logger.info('Resend OTP email skipped: email config not enabled or incomplete');
-    return;
-  }
-
-  const { subject, html, text } = buildResendOtpEmail({ firstName, otp });
-  await sendEmail({ to, subject, html, text });
-};
-
 const sendResetPasswordOtpEmail = async ({ to, firstName, otp }) => {
   if (!canSendEmail()) {
     logger.info('Reset password OTP email skipped: email config not enabled or incomplete');
@@ -93,7 +82,6 @@ const sendContactUsEmail = async ({ name, email, subject: userSubject, message }
 
 module.exports = {
   sendRegistrationSuccessEmail,
-  sendResendOtpEmail,
   sendResetPasswordOtpEmail,
   sendContactUsEmail,
 };

@@ -37,16 +37,13 @@ app.use(xss());
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// CORS configuration
+// CORS configuration (the cors middleware also handles pre-flight requests)
 app.use(
   cors({
     origin: config.cors.origin,
     credentials: true,
   })
 );
-
-// Enable CORS pre-flight for all routes
-app.options('*', cors());
 
 // Connect to the database
 connectDb();

@@ -1,20 +1,51 @@
 # MyApp API
 
-REST API boilerplate for **MyApp**, built with Node.js 20, Express 4 and MongoDB (Mongoose 9). Plain JavaScript (CommonJS), flat layer-based structure.
+REST API boilerplate built with **Node.js 20**, **Express 4** and **MongoDB (Mongoose 9)**. Plain JavaScript (CommonJS) with a flat, layer-based structure that is easy to extend.
 
-- Auth: JWT access tokens, bcrypt password hashing, token revocation on logout
-- Validation: Zod 4
-- Security: helmet, cors, express-mongo-sanitize, xss-clean, express-rate-limit
-- Logging: winston (files + console in dev) with morgan HTTP logs
-- Docs: Swagger UI at `/api-docs`
-- Email: Resend (disabled unless `EMAIL_ENABLED=true`)
-- Deployment: Docker and Docker Compose (see [DOCKER.md](DOCKER.md))
+- **Auth:** JWT access tokens, bcrypt password hashing, token revocation on logout
+- **Validation:** Zod 4
+- **Security:** helmet, cors, express-mongo-sanitize, xss-clean, express-rate-limit
+- **Logging:** winston (files + console in dev) with morgan HTTP request logs
+- **Docs:** Swagger UI at `/api-docs`
+- **Email:** Resend (disabled unless `EMAIL_ENABLED=true`)
+- **Deployment:** Docker and Docker Compose (see [DOCKER.md](DOCKER.md))
 
 Repository: [github.com/asad219/nodejs-api-boilerplate](https://github.com/asad219/nodejs-api-boilerplate)
 
-## Creating a new project from this boilerplate
+---
 
-### 1. Copy the boilerplate
+## Contents
+
+**Part 1: Start a new project**
+
+1. [Copy the boilerplate](#step-1-copy-the-boilerplate)
+2. [Rename the project](#step-2-rename-the-project)
+3. [Configure the environment](#step-3-configure-the-environment)
+4. [Install and run](#step-4-install-and-run)
+5. [Replace the sample Note resource](#step-5-replace-the-sample-note-resource)
+6. [Make the first commit](#step-6-make-the-first-commit)
+
+**Part 2: Working on the API**
+
+- [Quick start (local development)](#quick-start-local-development)
+- [Scripts](#scripts)
+- [Environment variables](#environment-variables)
+- [Folder structure](#folder-structure)
+- [Included endpoints](#included-endpoints)
+- [Password reset flow](#password-reset-flow)
+- [Token types](#token-types)
+- [Date and time formats](#date-and-time-formats)
+- [Conventions](#conventions)
+- [Adding a new resource](#adding-a-new-resource)
+- [Docker](#docker)
+
+---
+
+## Setting up a new project from this boilerplate
+
+Follow these steps in order to turn this boilerplate into your own project.
+
+### Step 1: Copy the boilerplate
 
 Clone it into a new folder and start a fresh git history:
 
@@ -33,7 +64,7 @@ cd my-new-api
 git init
 ```
 
-### 2. Rename the project
+### Step 2: Rename the project
 
 Replace the `MyApp` / `myapp` placeholders with your project's name. List every occurrence with:
 
@@ -61,29 +92,50 @@ rm package-lock.json
 npm install
 ```
 
-### 3. Configure the environment
+### Step 3: Configure the environment
 
 ```bash
 cp .env.example .env
 ```
 
-Set at least `CONNECTION_STRING` (with your own database name) and `JWT_SECRET` (generate one with `openssl rand -hex 32`). Set `EMAIL_ENABLED=true` and the Resend variables only when you're ready to send emails.
+Set at least:
 
-### 4. Replace the sample `Note` resource
+- `CONNECTION_STRING` — your MongoDB connection string, with your own database name
+- `JWT_SECRET` — generate one with `openssl rand -hex 32`
 
-`Note` is only an example. Once you've used it as a template for your first resource (see [Adding a new resource](#adding-a-new-resource)), delete it:
+Set `EMAIL_ENABLED=true` and the Resend variables only when you're ready to send emails. The full variable list is in [Environment variables](#environment-variables).
+
+### Step 4: Install and run
+
+```bash
+npm install
+npm run dev
+```
+
+Verify everything works:
+
+- Health check: [http://localhost:5005/health](http://localhost:5005/health)
+- Swagger UI: [http://localhost:5005/api-docs](http://localhost:5005/api-docs)
+- API base URL: `http://localhost:5005/api/v1`
+
+### Step 5: Replace the sample `Note` resource
+
+`Note` is only an example that demonstrates the full resource pattern end to end. Once you've used it as a template for your first real resource (see [Adding a new resource](#adding-a-new-resource)), delete it:
 
 ```bash
 rm models/noteModel.js validators/note.zod.js controllers/noteController.js \
    routes/noteRoutes.js docs/noteRoutes.swagger.js
 ```
 
-Remove the `noteRoutes` import and the `/notes` mount from `routes/index.js`, remove the `/notes` rows from the endpoints table below, and run `npm run db:schema` to refresh `docs/db-schema.json`.
+Then:
 
-### 5. Run it and make the first commit
+1. Remove the `noteRoutes` import and the `/notes` mount from `routes/index.js`.
+2. Remove the `/notes` rows from the endpoints table below.
+3. Run `npm run db:schema` to refresh `docs/db-schema.json`.
+
+### Step 6: Make the first commit
 
 ```bash
-npm run dev            # check http://localhost:5005/health and /api-docs
 npm run lint
 git add .
 git commit -m "Initial commit from boilerplate"
@@ -91,7 +143,9 @@ git remote add origin <your-new-repo-url>
 git push -u origin main
 ```
 
-## Getting started
+---
+
+## Quick start (local development)
 
 Requirements: Node.js 20+ and a MongoDB instance (local or Atlas).
 
@@ -148,7 +202,7 @@ routes/                # <resource>Routes.js + index.js (central router) + healt
 validators/            # <resource>.zod.js - Zod schemas and parse helpers
 middleware/            # auth, admin, ownership, rate limit, ObjectId and error handling
 services/              # external integrations (emailService.js)
-utils/                 # constants, token revocation, OTP helpers, email templates, date utils
+utils/                 # constants, token revocation, OTP helpers, email templates, date/time utils
 docs/                  # <resource>Routes.swagger.js (JSDoc @swagger blocks) + db-schema.json
 scripts/               # generateDbSchema.js
 logs/                  # winston output (gitignored)
@@ -190,6 +244,51 @@ The token only contains a keyed hash of the code, so the code cannot be read fro
 
 Every JWT carries an `aud` claim (`access`, `email-verification` or `reset-password`). `validateToken` only accepts `access` tokens, so reset and verification tokens can't be used to call protected endpoints even when they share `JWT_SECRET`.
 
+## Date and time formats
+
+`utils/dateTimeUtils.js` provides helpers for date-only and time-only values, so resources that receive or return `YYYY-MM-DD` dates or `HH:mm:ss` times (for example, birth dates, schedules or opening hours) don't reinvent parsing and formatting per endpoint.
+
+| Format    | String       | Stored as                            |
+| --------- | ------------ | ------------------------------------ |
+| Date only | `YYYY-MM-DD` | `Date` at midnight UTC               |
+| Time only | `HH:mm:ss`   | `Date` on base date `1900-01-01` UTC |
+
+| Function                                            | Direction    | Input                     | Output                                             |
+| --------------------------------------------------- | ------------ | ------------------------- | -------------------------------------------------- |
+| `formatDateOnly(date)`                              | Response     | `Date`                    | `'YYYY-MM-DD'` or `null`                           |
+| `formatTimeOnly(date)`                              | Response     | `Date`                    | `'HH:mm:ss'` or `null`                             |
+| `convertDateOnlyToDate(dateString)`                 | Request body | `'YYYY-MM-DD'`            | `Date` or `null`                                   |
+| `convertTimeOnlyToDate(timeString)`                 | Request body | `'HH:mm:ss'`              | `Date` or `null`                                   |
+| `transformDateFields(data, { dateKeys, timeKeys })` | Request body | object with string fields | shallow copy with those fields converted to `Date` |
+
+All functions return `null` for missing or invalid input instead of throwing, so invalid values can be caught by Zod validation first.
+
+Example — parsing date/time fields in a controller before saving:
+
+```js
+const { transformDateFields } = require('../utils/dateTimeUtils');
+
+const data = parseShiftCreate(req.body); // Zod validates the strings first
+const shift = await Shift.create(
+  transformDateFields(data, { dateKeys: ['shiftDate'], timeKeys: ['startTime', 'endTime'] })
+);
+```
+
+And formatting them back in a response:
+
+```js
+const { formatDateOnly, formatTimeOnly } = require('../utils/dateTimeUtils');
+
+res.status(200).json({
+  success: true,
+  shift: {
+    ...shift.toJSON(),
+    shiftDate: formatDateOnly(shift.shiftDate),
+    startTime: formatTimeOnly(shift.startTime),
+  },
+});
+```
+
 ## Conventions
 
 ### Errors
@@ -209,6 +308,8 @@ throw new Error('User not found');
 
 `validateObjectId` checks every route param, so only use it on routes whose params are all ObjectIds.
 
+`validateToken` verifies the access token and attaches it as `req.token` (used by logout for revocation) and its payload as `req.user`.
+
 ### Response shapes
 
 - Create: `201 { success: true, message: '<X> created successfully', <resource>: saved }`
@@ -226,3 +327,7 @@ throw new Error('User not found');
 7. `npm run db:schema` to refresh `docs/db-schema.json`.
 
 Use the `Note` files (`noteModel.js`, `note.zod.js`, `noteController.js`, `noteRoutes.js`, `noteRoutes.swagger.js`) as the template.
+
+## Docker
+
+Production-ready `Dockerfile` (multi-stage, non-root user, health check) and `docker-compose.yml` are included. See [DOCKER.md](DOCKER.md) for build, run and publish instructions.
