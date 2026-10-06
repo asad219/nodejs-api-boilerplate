@@ -1,0 +1,13 @@
+services:
+  myapp-api:
+    image: asad219/myapp-api:v1.0.0
+    container_name: myapp-api
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    ports:
+      - '${PORT:-5005}:${PORT:-5005}'

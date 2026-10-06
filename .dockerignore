@@ -1,0 +1,38 @@
+# Dependencies - installed fresh in container
+node_modules
+npm-debug.log*
+
+# Environment files - NEVER include secrets in image
+.env
+.env.*
+!.env.example
+
+# Git
+.git
+.gitignore
+
+# IDE and editor
+.vscode
+.idea
+*.swp
+*.swo
+.DS_Store
+
+# Logs and runtime data
+logs
+*.log
+/data
+
+# Test and coverage
+coverage
+.nyc_output
+tests
+*.test.js
+*.spec.js
+
+# Misc
+README.md
+DOCKER.md
+.dockerignore
+Dockerfile
+docker-compose*.yml

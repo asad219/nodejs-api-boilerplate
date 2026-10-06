@@ -1,0 +1,7 @@
+node_modules/
+logs/
+*.log
+.env
+package-lock.json
+coverage/
+docs/db-schema.json
